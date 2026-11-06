@@ -1,79 +1,66 @@
-# SKYLINE — Flight Operations
+# SKYLINE — Live Flight Radar
 
-**Release 1.0.0 · Multi-page static website**
+**Release 2.0.0 · Real ADS-B feed · Multi-page GitHub Pages website**
 
-SKYLINE is a responsive aviation operations dashboard concept. The release includes six connected sections and a GitHub Pages deployment workflow.
+SKYLINE is an enthusiast aircraft-tracking website. It plots real aircraft positions returned by the public ADSB.lol API on a real OpenStreetMap basemap.
+
+## Product purpose
+
+Explore aircraft reported by independent ADS-B/Mode-S receivers in a selected geographic area; inspect their currently reported transponder data; search by callsign, registration or ICAO24 address.
 
 ## Pages
 
-| Page | File | Purpose |
-|---|---|---|
-| Overview | index.html | Network dashboard, route preview, activity and flight board |
-| Live map | live-map.html | Schematic global map with selectable sample aircraft |
-| Flights | flights.html | Searchable/filterable flight board, details modal and CSV export |
-| Airports | airports.html | Searchable airport directory and sample activity cards |
-| Fleet | fleet.html | Aircraft register with type, registration, operator, base and status filters |
-| Analytics | analytics.html | Sample performance chart, regional distribution and CSV export |
-| About | about.html | Product overview, release notes and limitations |
+- `index.html` — Interactive geographic radar map. Drag the map to choose another radar centre; the data query covers up to 250 nautical miles from that centre.
+- `traffic.html` — Searchable table of currently returned aircraft in the selected area.
+- `lookup.html` — Query live aircraft records by callsign, registration or ICAO24.
+- `about.html` — Product purpose, data meanings, limitations, licensing and attribution.
+
+## Data providers
+
+### Aircraft positions: ADSB.lol
+
+The website calls the public API directly from the visitor's browser:
+
+- Radar area: `https://api.adsb.lol/v2/lat/{lat}/lon/{lon}/dist/250`
+- Callsign: `https://api.adsb.lol/v2/callsign/{callsign}`
+- Registration: `https://api.adsb.lol/v2/reg/{registration}`
+- ICAO24: `https://api.adsb.lol/v2/hex/{icao24}`
+
+The API returns real receiver-network observations. Missing values stay missing; SKYLINE does not invent a callsign, registration, route, schedule or position. API availability and rate limits are controlled by ADSB.lol. Its documentation says limits are dynamic and recommends contacting the operator before production use. The API and public data are published under ODbL 1.0.
+
+### Map: OpenStreetMap
+
+Leaflet displays geographic tiles from `tile.openstreetmap.org`. Visible attribution is included. Follow the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/) and attribution requirements. The map is not a navigation chart.
+
+## Refresh behaviour
+
+The selected radar area refreshes periodically while the page is visible. Moving the map to a new location requests a new area. If the provider returns HTTP 429 or another error, the page shows an error rather than making up aircraft or positions; retry is backed off.
 
 ## Run locally
 
-No build step, package manager or server-side runtime is required. Open index.html in a browser, or serve the directory with any static web server:
+No build tool or package installation is required. Open `index.html` in a browser or serve the folder using a local static server:
 
     python -m http.server 8000
 
-Then open http://localhost:8000.
+Open http://localhost:8000.
 
 ## GitHub Pages
 
-The repository includes .github/workflows/pages.yml. To deploy:
+The repository includes `.github/workflows/pages.yml`. In GitHub, open **Settings → Pages** and choose **GitHub Actions** as the source. Pushes to `main` publish the static site.
 
-1. Open **Settings → Pages** in the GitHub repository.
-2. Under **Build and deployment**, choose **GitHub Actions** as the source.
-3. Pushes to main will run the workflow and publish the static site.
+Expected URL: https://echoairgroup.github.io/SKYLINE/
 
-The expected Pages address is https://echoairgroup.github.io/SKYLINE/ once Pages is enabled and the deployment workflow has completed successfully.
+## Licensing and operational use
 
-## Features
+ADSB.lol public data: [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/). Map data: © OpenStreetMap contributors. Leaflet and MarkerCluster are third-party open-source libraries.
 
-- Responsive shared navigation and layout across all pages.
-- Light/dark theme preference saved in the browser.
-- Live local clock and date.
-- Selectable route-map aircraft and flight detail dialog.
-- Search and status/region filters for flights.
-- Search and region filter for airports.
-- Search and status filter for fleet entries.
-- CSV export for the flight board and analytics summary.
-- Responsive canvas chart with 7-day, 30-day and 12-week views.
-- Accessible labels, keyboard-operable flight rows and reduced-motion support.
-- Custom SVG favicon and a branded 404 page.
+This is an enthusiast situational-awareness tool, not certified ATC, navigation, dispatch or flight-safety equipment. Coverage is incomplete and may be delayed, unavailable or inaccurate. Do not use it for real-world operational decisions.
 
-## Data and operational limitations
+## Release 2.0.0
 
-**This release uses bundled fictional demonstration data.** Flight IDs, airline names, registrations, aircraft records, times, route progress, airport movements and analytics values are sample content created to demonstrate the interface. The route map is schematic and not to scale.
-
-SKYLINE 1.0.0 is not connected to live ADS-B, airline dispatch systems, airport feeds, flight schedules, an API or a database. It does not provide certified navigation, dispatch, safety or operational decision support. Do not use the demonstration values for real-world aviation operations.
-
-## Project structure
-
-    SKYLINE/
-    ├── .github/workflows/pages.yml
-    ├── assets/favicon.svg
-    ├── css/styles.css
-    ├── js/app.js
-    ├── js/data.js
-    ├── index.html
-    ├── live-map.html
-    ├── flights.html
-    ├── airports.html
-    ├── fleet.html
-    ├── analytics.html
-    ├── about.html
-    └── 404.html
-
-## Release
-
-- Version: 1.0.0
-- Type: Static front-end release
-- Target: GitHub Pages or any static host
-- Dependencies: None at runtime; Google Fonts are optional external typography assets
+- Removed all fictional sample flights, sample airport statistics and mock fleet/analytics pages.
+- Added a real Leaflet map with OpenStreetMap geographic tiles.
+- Added live ADS-B area queries and aircraft markers from ADSB.lol.
+- Added selected-aircraft details, nearby aircraft list, filters and aircraft lookup.
+- Added explicit coverage, refresh, source and limitations information.
+- Added responsive navigation and a coherent multi-page product.
